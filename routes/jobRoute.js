@@ -9,7 +9,9 @@ jobRouter.get("/",async(req,res)=>{
     if(jobs){
         const {q}= req.query;
         if(q){
-            const jobs= await JobModel.find({$or:[{locate:new RegExp(q,'i')},{skillrequire:new RegExp(q,'i')}]});
+            const jobs= await JobModel.find({$or:[{locate:new RegExp(q,'i')},{skillrequire:new RegExp(q,'i')},
+                                                    {position:new RegExp(q,'i')},{company:new RegExp(q,'i')},
+                                                    {companyDetails:new RegExp(q,'i')}]});
             if(jobs){
                 res.status(200).send(jobs)
             }else{
@@ -116,6 +118,7 @@ jobRouter.delete("/auth/delete/:jobid",Authentication,async(req,res)=>{
     const {id}= req.body;
     const {jobid}= req.params;
     const existJob= await JobModel.findOneAndDelete({_id:jobid,postby:id});
+                    await ApplyJobModel.findOneAndDelete({jobid})
     if(existJob){
         res.status(200).send(`Job successfully deleted`)
     }else{
